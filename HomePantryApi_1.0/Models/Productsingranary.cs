@@ -29,5 +29,5 @@ public class Productsingranary
 
     public string? Rodzaj { get; set; }
 
-    public virtual Granary Granary { get; set; } = null!;
+    public virtual Granary? Granary { get; set; }
 }

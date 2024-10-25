@@ -26,14 +26,30 @@ public class ProductsInGranaryRepository : IProductsInGranaryRepository
 
     public async Task AddProductToGranaryAsync(Productsingranary product)
     {
+
+        var granaryExists = await _context.Granaries.AnyAsync(g => g.Id == product.GranaryId);
+        if (!granaryExists)
+        {
+            throw new Exception($"Granary nie istnieje.");
+        }
+
         await _context.Productsingranaries.AddAsync(product);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateProductInGranaryAsync(Productsingranary product)
     {
-        _context.Productsingranaries.Update(product);
+       
+        var existingEntity = await _context.Productsingranaries.FindAsync(product.ProductId);
+
+        if (existingEntity != null)
+        {
+            _context.Entry(existingEntity).State = EntityState.Detached;
+        }
+
+        _context.Update(product);
         await _context.SaveChangesAsync();
+
     }
 
     public async Task DeleteProductFromGranaryAsync(int productId)

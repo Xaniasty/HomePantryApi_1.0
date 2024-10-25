@@ -29,5 +29,5 @@ public class Productsinshoplist
 
     public string? Rodzaj { get; set; }
 
-    public virtual Shoplist Shoplist { get; set; } = null!;
+    public virtual Shoplist? Shoplist { get; set; }
 }

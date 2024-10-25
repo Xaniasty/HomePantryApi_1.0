@@ -26,13 +26,27 @@ public class ProductsInShoplistRepository : IProductsInShoplistRepository
 
     public async Task AddProductToShoplistAsync(Productsinshoplist product)
     {
+
+        var shoplistExists = await _context.Shoplists.AnyAsync(s => s.Id == product.ShoplistId);
+        if (!shoplistExists)
+        {
+            throw new Exception($"Shoplist nie istnieje.");
+        }
+
         await _context.Productsinshoplists.AddAsync(product);
         await _context.SaveChangesAsync();
     }
 
     public async Task UpdateProductInShoplistAsync(Productsinshoplist product)
     {
-        _context.Productsinshoplists.Update(product);
+        var existingEntity = await _context.Productsinshoplists.FindAsync(product.ProductId);
+
+        if (existingEntity != null)
+        {
+            _context.Entry(existingEntity).State = EntityState.Detached;
+        }
+
+        _context.Update(product);
         await _context.SaveChangesAsync();
     }
 
