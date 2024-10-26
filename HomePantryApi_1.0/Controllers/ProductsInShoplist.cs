@@ -1,6 +1,7 @@
 ﻿using HomePantryApi_1._0.Models;
 using HomePantryApi_1._0.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HomePantryApi_1._0.Controllers;
 
@@ -70,5 +71,8 @@ public class ProductsInShoplistController : ControllerBase
         await _productsInShoplistRepository.DeleteProductFromShoplistAsync(productId);
         return NoContent();
     }
+
+
+
 }
 

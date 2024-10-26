@@ -10,5 +10,6 @@ public interface IGranaryRepository
     Task UpdateGranaryAsync(Granary granary);
     Task DeleteGranaryAsync(int granaryId);
     Task DeleteAllGranariesForUserAsync(int userId);
+    Task<Granary> CreateGranaryFromShoplistAsync(int shoplistId,int userId);
 
 }

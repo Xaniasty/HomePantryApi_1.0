@@ -73,4 +73,24 @@ public class GranaryController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("CreateFromShoplist/user/{userId}/{shoplistId}")]
+    public async Task<IActionResult> CreateGranaryFromShoplist(int shoplistId, int userId)
+    {
+        try
+        {
+            var newGranary = await _granaryRepository.CreateGranaryFromShoplistAsync(shoplistId, userId);
+            return CreatedAtAction(nameof(GetGranaryById), new { id = newGranary.Id }, newGranary);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Wystąpił błąd podczas tworzenia magazynu.");
+        }
+    }
+
+
 }

@@ -10,6 +10,7 @@ public interface IShoplistRepository
     Task UpdateShopListsAsync(Shoplist shoplist);
     Task DeleteShopListAsync(int shoplistId);
     Task DeleteShopListsForUserAsync(int userId);
+    Task<Shoplist> CreateShoplistFromGranaryAsync(int granaryId, int userId);
 
 
 }

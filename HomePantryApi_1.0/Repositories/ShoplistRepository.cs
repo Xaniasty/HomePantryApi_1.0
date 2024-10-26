@@ -71,4 +71,41 @@ public class ShoplistRepository : IShoplistRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<Shoplist> CreateShoplistFromGranaryAsync(int granaryId, int userId)
+    {
+
+        var productsInGranary = await _context.Productsingranaries
+            .Where(p => p.GranaryId == granaryId)
+            .ToListAsync();
+
+        var newShoplist = new Shoplist
+        {
+            UserId = userId,
+            ShoplistName = "Lista z magazynu", 
+            DataUtworzenia = DateTime.Now, 
+            DataAktualizacji = DateTime.Now, 
+            Opis = "Lista stworzona z magazynu", 
+            Productsinshoplists = productsInGranary.Select(p => new Productsinshoplist
+            {
+                ProductName = p.ProductName,
+                Quantity = p.Quantity,
+                IsLiquid = p.IsLiquid,
+                Weight = p.Weight,
+                Description = p.Description,
+                InPackage = p.InPackage,
+                DataZakupu = p.DataZakupu,
+                DataWaznosci = p.DataWaznosci,
+                Cena = p.Cena,
+                Rodzaj = p.Rodzaj
+            }).ToList()
+        };
+
+        await _context.Shoplists.AddAsync(newShoplist);
+        await _context.SaveChangesAsync();
+
+        return newShoplist;
+    }
+
+
 }

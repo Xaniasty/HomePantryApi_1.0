@@ -73,4 +73,26 @@ public class ShoplistController : ControllerBase
 
         return NoContent();
     }
+
+
+    [HttpPost("CreateShoplistFromGranary/user/{userId}/{granaryId}")]
+    public async Task<IActionResult> CreateShoplistFromGranary(int granaryId, int userId)
+    {
+        try
+        {
+            var newShoplist = await _shoplistRepository.CreateShoplistFromGranaryAsync(granaryId, userId);
+            return CreatedAtAction(nameof(GetShoplistById), new { id = newShoplist.Id }, newShoplist);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Wystąpił błąd podczas tworzenia listy zakupów.");
+        }
+    }
+
+
+
 }

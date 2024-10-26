@@ -11,15 +11,15 @@ public class Productsingranary
 
     public string ProductName { get; set; } = null!;
 
-    public int Quantity { get; set; }
+    public int? Quantity { get; set; } = 1;
 
-    public bool IsLiquid { get; set; }
+    public bool IsLiquid { get; set; } = false;
 
-    public decimal Weight { get; set; }
+    public decimal? Weight { get; set; } = 0.01m;
 
     public string? Description { get; set; }
 
-    public bool InPackage { get; set; }
+    public bool InPackage { get; set; } = false;
 
     public DateOnly? DataZakupu { get; set; }
 

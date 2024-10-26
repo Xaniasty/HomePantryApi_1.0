@@ -19,9 +19,11 @@ public class GranaryRepository : IGranaryRepository
         return await _context.Granaries.Where(g => g.UserId == userId).ToListAsync();
     }
 
-    public async Task<Granary> GetGranaryByIdAsync(int granaryId)
+    public async Task<Granary?> GetGranaryByIdAsync(int granaryId)
     {
-        return await _context.Granaries.FindAsync(granaryId);
+        return await _context.Granaries
+            .Include(g => g.Productsingranaries)
+            .FirstOrDefaultAsync(g => g.Id == granaryId);
     }
 
     public async Task AddGranaryAsync(Granary granary)
@@ -38,13 +40,12 @@ public class GranaryRepository : IGranaryRepository
         {
             existingGranary.GranaryName = granary.GranaryName;
             existingGranary.Opis = granary.Opis;
-            existingGranary.DataAktualizacji = DateTime.Now; // lub inna logika aktualizacji
+            existingGranary.DataAktualizacji = DateTime.Now; 
 
             await _context.SaveChangesAsync();
         }
         else
         {
-            // Obsłuż sytuację, gdy granary nie został znaleziony
             throw new InvalidOperationException($"Granary with Id {granary.Id} does not exist.");
         }
     }
@@ -74,11 +75,49 @@ public class GranaryRepository : IGranaryRepository
 
         foreach (var granary in granaries)
         {
-            // Usuń produkty powiązane z każdym granary
             _context.Productsingranaries.RemoveRange(granary.Productsingranaries);
         }
 
         _context.Granaries.RemoveRange(granaries);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<Granary> CreateGranaryFromShoplistAsync(int shoplistId, int userId)
+    {
+        var productsInShoplist = await _context.Productsinshoplists
+            .Where(p => p.ShoplistId == shoplistId)
+            .ToListAsync();
+
+        var newGranary = new Granary
+        {
+            UserId = userId,
+            GranaryName = "Magazyn z listy", 
+            DataUtworzenia = DateTime.Now,
+            DataAktualizacji = DateTime.Now,
+            Opis = "Magazyn stworzony z listy zakupów.",
+
+            Productsingranaries = productsInShoplist.Select(p => new Productsingranary
+            {
+                ProductName = p.ProductName,
+                Quantity = p.Quantity,
+                IsLiquid = p.IsLiquid,
+                Weight = p.Weight,
+                Description = p.Description,
+                InPackage = p.InPackage,
+                DataZakupu = p.DataZakupu,
+                DataWaznosci = p.DataWaznosci,
+                Cena = p.Cena,
+                Rodzaj = p.Rodzaj
+            }).ToList()
+        };
+
+
+
+        await _context.Granaries.AddAsync(newGranary);
+        await _context.SaveChangesAsync();
+
+        return newGranary;
+    }
+
+
 }
