@@ -47,29 +47,35 @@ public class UserRepository : IUserRepository
         var existingUserWithEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
         var existingUserWithLogin = await _context.Users.FirstOrDefaultAsync(u => u.Login == user.Login);
 
-        if (existingUserWithEmail != null || existingUserWithLogin != null) {
+        if (existingUserWithEmail != null || existingUserWithLogin != null)
+        {
             throw new Exception("Email or Login is already taken");
         }
 
+        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
         await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync(); 
+        await _context.SaveChangesAsync();
         return user;
     }
 
     public async Task UpdateUserAsync(int id, User user)
     {
-        
+
         var existingUser = await _context.Users.FindAsync(id);
         if (existingUser == null)
         {
             throw new KeyNotFoundException("User not found.");
         }
 
-
         existingUser.Email = user.Email;
         existingUser.Login = user.Login;
-        existingUser.Password = user.Password;
-   
+
+        // Sprawdź, czy hasło jest zmieniane
+        if (!string.IsNullOrEmpty(user.Password))
+        {
+            existingUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password); // Hashuj nowe hasło
+        }
 
         await _context.SaveChangesAsync();
     }
@@ -86,7 +92,27 @@ public class UserRepository : IUserRepository
         {
             throw new Exception("User not found.");
         }
+    }
 
-        
+    public async Task<User?> ValidateUserAsync(string input, string password)
+    {
+        User? user = null;
+
+        if (input.Contains("@"))
+        {
+            user = await _context.Users.FirstOrDefaultAsync(u => u.Email == input);
+        }
+        else
+        {
+            user = await _context.Users.FirstOrDefaultAsync(u => u.Login == input);
+        }
+
+        // Weryfikacja hasła
+        if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
+        {
+            return user;
+        }
+
+        return null;
     }
 }

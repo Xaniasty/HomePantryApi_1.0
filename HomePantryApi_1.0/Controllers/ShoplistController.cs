@@ -81,7 +81,7 @@ public class ShoplistController : ControllerBase
         try
         {
             var newShoplist = await _shoplistRepository.CreateShoplistFromGranaryAsync(granaryId, userId);
-            return CreatedAtAction(nameof(GetShoplistById), new { id = newShoplist.Id }, newShoplist);
+            return CreatedAtAction(nameof(GetShoplistById), new { shoplistId = newShoplist.Id }, newShoplist);
         }
         catch (InvalidOperationException ex)
         {
@@ -89,7 +89,7 @@ public class ShoplistController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Wystąpił błąd podczas tworzenia listy zakupów.");
+            return StatusCode(500, $"Wystąpił błąd podczas tworzenia listy zakupów. {ex.Message}");
         }
     }
 

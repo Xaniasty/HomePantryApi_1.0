@@ -36,8 +36,22 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<User>> CreateUser(User user)
     {
-        await _userRepository.CreateUserAsync(user);
-        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await _userRepository.CreateUserAsync(user);
+            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+        }
+        catch (Exception ex)
+        {
+            
+            Console.WriteLine(ex.Message);
+            return StatusCode(500, "Wystąpił błąd podczas tworzenia użytkownika: " + ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
@@ -64,4 +78,20 @@ public class UsersController : ControllerBase
         await _userRepository.DeleteUserAsync(id);
         return NoContent();
     }
+
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+    {
+        var user = await _userRepository.ValidateUserAsync(loginRequest.EmailOrLogin, loginRequest.Password);
+
+        if (user == null)
+        {
+            return BadRequest("Invalid password or login.");
+        }
+
+        return Ok("Login successful.");
+    }
+
+
 }

@@ -80,7 +80,7 @@ public class GranaryController : ControllerBase
         try
         {
             var newGranary = await _granaryRepository.CreateGranaryFromShoplistAsync(shoplistId, userId);
-            return CreatedAtAction(nameof(GetGranaryById), new { id = newGranary.Id }, newGranary);
+            return CreatedAtAction(nameof(GetGranaryById), new { granaryId = newGranary.Id }, newGranary);
         }
         catch (InvalidOperationException ex)
         {
@@ -88,7 +88,7 @@ public class GranaryController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, "Wystąpił błąd podczas tworzenia magazynu.");
+            return StatusCode(500, $"Wystąpił błąd podczas tworzenia magazynu. {ex.Message}");
         }
     }
 
