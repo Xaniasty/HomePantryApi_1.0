@@ -5,21 +5,30 @@ using HomePantryApi_1._0.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; });
 
-builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
+});
+
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; });
+
 
 builder.Services.AddDbContext<SpizDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 27)))); 
+        new MySqlServerVersion(new Version(8, 0, 27))));
+
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IGranaryRepository, GranaryRepository>();
 builder.Services.AddScoped<IShoplistRepository, ShoplistRepository>();
 builder.Services.AddScoped<IProductsInGranaryRepository, ProductsInGranaryRepository>();
 builder.Services.AddScoped<IProductsInShoplistRepository, ProductsInShoplistRepository>();
-
-
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -32,8 +41,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins");
 
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();

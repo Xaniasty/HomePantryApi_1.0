@@ -107,7 +107,7 @@ public class UserRepository : IUserRepository
             user = await _context.Users.FirstOrDefaultAsync(u => u.Login == input);
         }
 
-        // Weryfikacja hasła
+        
         if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
             return user;

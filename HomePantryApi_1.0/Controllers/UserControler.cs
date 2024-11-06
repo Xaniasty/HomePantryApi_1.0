@@ -84,13 +84,14 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
         var user = await _userRepository.ValidateUserAsync(loginRequest.EmailOrLogin, loginRequest.Password);
+        //var userId = await _userRepository.
 
         if (user == null)
         {
             return BadRequest("Invalid password or login.");
         }
 
-        return Ok("Login successful.");
+        return Ok(user);
     }
 
 
