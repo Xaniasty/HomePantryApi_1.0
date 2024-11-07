@@ -41,6 +41,25 @@ public class GranaryController : ControllerBase
         return CreatedAtAction(nameof(GetGranaryById), new { granaryId = granary.Id }, granary);
     }
 
+    //[HttpPut("{granaryId}")]
+    //public async Task<IActionResult> UpdateGranary(int granaryId, Granary granary)
+    //{
+    //    if (granaryId != granary.Id)
+    //    {
+    //        return BadRequest("Granary ID mismatch.");
+    //    }
+
+    //    var existingGranary = await _granaryRepository.GetGranaryByIdAsync(granaryId);
+    //    if (existingGranary == null)
+    //    {
+    //        return NotFound("Granary not found.");
+    //    }
+
+    //    await _granaryRepository.UpdateGranaryAsync(granary);
+    //    return NoContent();
+    //}
+
+
     [HttpPut("{granaryId}")]
     public async Task<IActionResult> UpdateGranary(int granaryId, Granary granary)
     {
@@ -55,7 +74,13 @@ public class GranaryController : ControllerBase
             return NotFound("Granary not found.");
         }
 
-        await _granaryRepository.UpdateGranaryAsync(granary);
+        // Aktualizacja właściwości istniejącego obiektu
+        existingGranary.DataAktualizacji = granary.DataAktualizacji;
+        existingGranary.GranaryName = granary.GranaryName;
+        existingGranary.Opis = granary.Opis;
+        // Dodaj więcej pól w zależności od modelu Granary
+
+        await _granaryRepository.UpdateGranaryAsync(existingGranary);
         return NoContent();
     }
 

@@ -41,6 +41,24 @@ public class ShoplistController : ControllerBase
         return CreatedAtAction(nameof(GetShoplistById), new { shoplistId = shoplist.Id }, shoplist);
     }
 
+    //[HttpPut("{shoplistId}")]
+    //public async Task<IActionResult> UpdateShoplist(int shoplistId, Shoplist shoplist)
+    //{
+    //    if (shoplistId != shoplist.Id)
+    //    {
+    //        return BadRequest("Shoplist ID mismatch.");
+    //    }
+
+    //    var existingShoplist = await _shoplistRepository.GetShopListByIdAsync(shoplistId);
+    //    if (existingShoplist == null)
+    //    {
+    //        return NotFound("Shoplist not found.");
+    //    }
+
+    //    await _shoplistRepository.UpdateShopListsAsync(shoplist);
+    //    return NoContent();
+    //}
+
     [HttpPut("{shoplistId}")]
     public async Task<IActionResult> UpdateShoplist(int shoplistId, Shoplist shoplist)
     {
@@ -55,7 +73,13 @@ public class ShoplistController : ControllerBase
             return NotFound("Shoplist not found.");
         }
 
-        await _shoplistRepository.UpdateShopListsAsync(shoplist);
+        // Aktualizacja właściwości istniejącego obiektu
+        existingShoplist.DataAktualizacji = shoplist.DataAktualizacji;
+        existingShoplist.ShoplistName = shoplist.ShoplistName;
+        existingShoplist.Opis = shoplist.Opis;
+        // Dodaj więcej pól w zależności od modelu Shoplist
+
+        await _shoplistRepository.UpdateShopListsAsync(existingShoplist);
         return NoContent();
     }
 
