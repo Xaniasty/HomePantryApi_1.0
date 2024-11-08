@@ -74,11 +74,9 @@ public class GranaryController : ControllerBase
             return NotFound("Granary not found.");
         }
 
-        // Aktualizacja właściwości istniejącego obiektu
         existingGranary.DataAktualizacji = granary.DataAktualizacji;
         existingGranary.GranaryName = granary.GranaryName;
         existingGranary.Opis = granary.Opis;
-        // Dodaj więcej pól w zależności od modelu Granary
 
         await _granaryRepository.UpdateGranaryAsync(existingGranary);
         return NoContent();
@@ -113,7 +111,29 @@ public class GranaryController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Wystąpił błąd podczas tworzenia magazynu. {ex.Message}");
+            return StatusCode(500, $"Error during creating process {ex.Message}");
+        }
+    }
+
+
+    [HttpDelete("user/{userId}")]
+    public async Task<IActionResult> DeleteAllGranariesForUser(int userId)
+    {
+        try
+        {
+            var userGranaries = await _granaryRepository.GetAllGranariesForUserAsync(userId);
+            if (!userGranaries.Any())
+            {
+                return NotFound("No granaries found for this user.");
+            }
+
+            await _granaryRepository.DeleteAllGranariesForUserAsync(userId);
+
+            return Ok("All granaries for the user have been deleted.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting granaries for the user. {ex.Message}");
         }
     }
 

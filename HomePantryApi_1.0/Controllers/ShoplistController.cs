@@ -73,11 +73,9 @@ public class ShoplistController : ControllerBase
             return NotFound("Shoplist not found.");
         }
 
-        // Aktualizacja właściwości istniejącego obiektu
         existingShoplist.DataAktualizacji = shoplist.DataAktualizacji;
         existingShoplist.ShoplistName = shoplist.ShoplistName;
         existingShoplist.Opis = shoplist.Opis;
-        // Dodaj więcej pól w zależności od modelu Shoplist
 
         await _shoplistRepository.UpdateShopListsAsync(existingShoplist);
         return NoContent();
@@ -114,6 +112,27 @@ public class ShoplistController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"Wystąpił błąd podczas tworzenia listy zakupów. {ex.Message}");
+        }
+    }
+
+    [HttpDelete("user/{userId}")]
+    public async Task<IActionResult> DeleteAllGranariesForUser(int userId)
+    {
+        try
+        {
+            var userShoplists = await _shoplistRepository.GetAllShopListsForUserAsync(userId);
+            if (!userShoplists.Any())
+            {
+                return NotFound("No shoplists found for this user.");
+            }
+
+            await _shoplistRepository.DeleteShopListsForUserAsync(userId);
+
+            return Ok("All shoplists for the user have been deleted.");
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An error occurred while deleting shoplists for the user. {ex.Message}");
         }
     }
 
